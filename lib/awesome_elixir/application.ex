@@ -14,6 +14,7 @@ defmodule AwesomeElixir.Application do
       supervisor(AwesomeElixirWeb.Endpoint, []),
       # Start your own worker by calling: AwesomeElixir.Worker.start_link(arg1, arg2, arg3)
       # worker(AwesomeElixir.Worker, [arg1, arg2, arg3]),
+      supervisor(AwesomeElixir.Scheduler, [])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
