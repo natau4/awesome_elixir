@@ -7,7 +7,7 @@ services:
     environment:
       - MIX_ENV=dev
       - PORT=4000
-      - DATABASE_URL=ecto://postgres:postgres@postgres/test_phx
+      - DATABASE_URL=ecto://postgres:postgres@postgres/awesome_elixir_dev
     volumes:
       - .:/app
     ports:
