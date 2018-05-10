@@ -40,7 +40,11 @@ defmodule AwesomeElixir.Mixfile do
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
-      {:cowboy, "~> 1.0"}
+      {:cowboy, "~> 1.0"},
+      {:earmark, "~> 1.2"},
+      {:httpotion, "~> 3.1.0"},
+      {:exjson, "~> 0.6.0"},
+      {:cronex, "~> 0.4.0"}
     ]
   end
 
