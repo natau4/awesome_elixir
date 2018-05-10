@@ -1,4 +1,6 @@
 defmodule AwesomeElixir.Parser do
+  import AwesomeElixir.Lib
+
   @line_regex ~r/^\[([^]]+)\]\(([^)]+)\) - (.+)([\.\!]+)$/
 
   def parse(lines) do
@@ -79,6 +81,6 @@ defmodule AwesomeElixir.Parser do
         String.rstrip(line)
     end
     [name, link, description] = parse_line(line)
-    %AwesomeElixir.AwesomeApplication{name: name, url: link, description: description}
+    %AwesomeElixir.Lib{name: name, url: link, description: description}
   end
 end

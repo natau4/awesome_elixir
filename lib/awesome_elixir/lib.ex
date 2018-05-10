@@ -1,4 +1,4 @@
-defmodule TestPhx.AwesomeApplication do
+defmodule AwesomeElixir.Lib do
   use Ecto.Schema
   import Ecto.Changeset
 

@@ -28,7 +28,7 @@ defmodule AwesomeElixir.Aggregator do
           %{pushed_at: days_after_last_commit, stargazers_count: stars} = AwesomeElixir.Parser.parse_repo_meta(repo_meta)
           category_data = AwesomeElixir.Repo.get_by(AwesomeElixir.Category, [name: category_name])
 
-          result ++ [save_awesome_application(%AwesomeElixir.AwesomeApplication{item | days_after_last_commit: days_after_last_commit, stars: stars, category_id: category_data.id})]
+          result ++ [save_awesome_application(%AwesomeElixir.Lib{item | days_after_last_commit: days_after_last_commit, stars: stars, category_id: category_data.id})]
         _ ->
           Logger.warn("Failed to get metadata for #{item.url}")
           result
@@ -46,11 +46,11 @@ defmodule AwesomeElixir.Aggregator do
   end
 
   defp save_awesome_application(application) do
-    case AwesomeElixir.Repo.get_by(AwesomeElixir.AwesomeApplication, [name: application.name]) do
+    case AwesomeElixir.Repo.get_by(AwesomeElixir.Lib, [name: application.name]) do
       nil  -> application
       saved -> saved
     end
-    |> AwesomeElixir.AwesomeApplication.changeset(Map.from_struct(application))
+    |> AwesomeElixir.Lib.changeset(Map.from_struct(application))
     |> AwesomeElixir.Repo.insert_or_update
   end
 end
