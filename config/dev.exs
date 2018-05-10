@@ -7,7 +7,7 @@ use Mix.Config
 # watchers to your application. For example, we use it
 # with brunch.io to recompile .js and .css sources.
 config :awesome_elixir, AwesomeElixirWeb.Endpoint,
-  http: [port: 4000],
+  http: [port: System.get_env("PORT") || 4000],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
@@ -51,8 +51,5 @@ config :phoenix, :stacktrace_depth, 20
 # Configure your database
 config :awesome_elixir, AwesomeElixir.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "awesome_elixir_dev",
-  hostname: "localhost",
+  url: System.get_env("DATABASE_URL"),
   pool_size: 10
