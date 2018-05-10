@@ -1,4 +1,4 @@
-defmodule TestPhx.Repo.Migrations.AddCategoryIdToAwesomeApplications do
+defmodule AwesomeElixir.Repo.Migrations.AddCategoryIdToAwesomeApplications do
   use Ecto.Migration
 
   def change do

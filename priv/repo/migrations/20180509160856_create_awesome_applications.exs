@@ -1,4 +1,4 @@
-defmodule TestPhx.Repo.Migrations.CreateAwesomeApplications do
+defmodule AwesomeElixir.Repo.Migrations.CreateAwesomeApplications do
   use Ecto.Migration
 
   def change do

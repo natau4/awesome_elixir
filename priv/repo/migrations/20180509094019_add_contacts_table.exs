@@ -1,4 +1,4 @@
-defmodule TestPhx.Repo.Migrations.AddContactsTable do
+defmodule AwesomeElixir.Repo.Migrations.AddContactsTable do
   use Ecto.Migration
 
   def change do

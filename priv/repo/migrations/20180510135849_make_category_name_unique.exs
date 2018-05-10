@@ -1,4 +1,4 @@
-defmodule TestPhx.Repo.Migrations.MakeCategoryNameUnique do
+defmodule AwesomeElixir.Repo.Migrations.MakeCategoryNameUnique do
   use Ecto.Migration
 
   def change do

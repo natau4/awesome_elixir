@@ -1,4 +1,4 @@
-defmodule TestPhx.Repo.Migrations.CreateCategories do
+defmodule AwesomeElixir.Repo.Migrations.CreateCategories do
   use Ecto.Migration
 
   def change do
