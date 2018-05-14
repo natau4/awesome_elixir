@@ -5,7 +5,7 @@
 ```sh
 	docker-compose exec web /bin/bash
 	iex -S mix
-	AwesomeElixir.Aggregator.Aggregate
+	AwesomeElixir.Aggregator.aggregate
 ```
   * Для последующих запусков Docker-контейнеров используйте команду `make up`
   * Для остановки Docker-контейнеров используйте команду `make down`
