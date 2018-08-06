@@ -21,6 +21,8 @@ defmodule AwesomeElixirWeb.PageController do
       c_query = c_query |> where([a], fragment("stars >= ?", ^min_stars))
       a_query = a_query |> where([a], a.stars >= ^min_stars)
     end
+    #что если убрать if. Будет ли такой код легче читать, тестировать?
+    #какие есть преимущества у single assignment?
 
     categories = c_query |> AwesomeElixir.Repo.all
     applications = a_query |> AwesomeElixir.Repo.all
