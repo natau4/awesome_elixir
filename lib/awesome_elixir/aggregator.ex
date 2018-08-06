@@ -8,7 +8,13 @@ defmodule AwesomeElixir.Aggregator do
     {categories, apps} = AwesomeElixir.Parser.parse(readme_raw)
 
     Enum.each(categories, fn(category) -> save_category(category) end)
+    # как это можно это переписать без создания анонимной ф-ции?
+    
     Enum.map(apps, fn({category_name, items}) -> {category_name, get_repo_meta(category_name, items, [])} end)
+    # ф-я get_repo_meta по факту реализует свертку.
+    # Улучшится ли читаемость кода если переписать это с использованием Enum.reduce
+    
+    #Как можно сделать удаление старых данных?
   end
 
   defp get_repo_meta(_, [], result) do
@@ -17,6 +23,7 @@ defmodule AwesomeElixir.Aggregator do
 
   defp get_repo_meta(category_name, [item | tail], result) do
     result = if (URI.parse(item.url).host == nil || URI.parse(item.url).host != "github.com") do
+      #для чего нужна проверка на nil?
       Logger.warn("#{item.name} has no links to github. Skip")
       result
     else
@@ -24,15 +31,19 @@ defmodule AwesomeElixir.Aggregator do
 
       case status_code do
         200 ->
+          #Как можно избавиться от вложенных условий в этой ф-ции?
           repo_meta = ExJSON.parse(body, :to_map)
           %{pushed_at: days_after_last_commit, stargazers_count: stars} = AwesomeElixir.Parser.parse_repo_meta(repo_meta)
           category_data = AwesomeElixir.Repo.get_by(AwesomeElixir.Category, [name: category_name])
+          #Как можно уменьшить кол-во обращений к база для получения id категории?
 
           result ++ [save_awesome_application(%AwesomeElixir.Lib{item | days_after_last_commit: days_after_last_commit, stars: stars, category_id: category_data.id})]
+          #почему неправильно, что метод save_smth вызывается внутри ф-ции с названием get_smth?
         _ ->
           Logger.warn("Failed to get metadata for #{item.url}")
           result
       end
+      #Сколько действий/шагов/ответственностей у данной ф-ции?
     end
 
     get_repo_meta(category_name, tail, result)
@@ -50,6 +61,7 @@ defmodule AwesomeElixir.Aggregator do
       nil  -> application
       saved -> saved
     end
+    #как можно переписать предыдущие 4 строки более кратко с использованием Boolean operators
     |> AwesomeElixir.Lib.changeset(Map.from_struct(application))
     |> AwesomeElixir.Repo.insert_or_update
   end
