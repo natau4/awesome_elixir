@@ -1,6 +1,8 @@
 require Logger
 
 defmodule AwesomeElixir.Aggregator do
+  import Ecto.Query
+
   @awesome_repo "/h4cc/awesome-elixir/readme"
 
   def aggregate() do
@@ -8,34 +10,35 @@ defmodule AwesomeElixir.Aggregator do
     {categories, apps} = AwesomeElixir.Parser.parse(readme_raw)
 
     Enum.each(categories, fn(category) -> save_category(category) end)
-    Enum.map(apps, fn({category_name, items}) -> {category_name, get_repo_meta(category_name, items, [])} end)
+    Enum.each(apps, fn({category_name, items}) -> 
+        category = AwesomeElixir.Repo.get_by(AwesomeElixir.Category, [name: category_name])
+
+        Enum.reduce(items, [], fn(app, acc) -> get_repo_meta(app, category.id, acc) end) 
+          |> Enum.each(fn(app) -> save_awesome_application(app) end)
+
+      end)
+
+    delete_old_app
   end
 
-  defp get_repo_meta(_, [], result) do
-    result
-  end
-
-  defp get_repo_meta(category_name, [item | tail], result) do
-    result = if (URI.parse(item.url).host == nil || URI.parse(item.url).host != "github.com") do
-      Logger.warn("#{item.name} has no links to github. Skip")
+  def get_repo_meta(app, category_id, result) do
+    if (URI.parse(app.url).host != "github.com") do
+      Logger.warn("#{app.name} has no links to github. Skip")
       result
     else
-      %HTTPotion.Response{body: body, status_code: status_code} = AwesomeElixir.GithubConnector.get(URI.parse(item.url).path)
+      %HTTPotion.Response{body: body, status_code: status_code} = AwesomeElixir.GithubConnector.get(URI.parse(app.url).path)
 
       case status_code do
         200 ->
-          repo_meta = ExJSON.parse(body, :to_map)
-          %{pushed_at: days_after_last_commit, stargazers_count: stars} = AwesomeElixir.Parser.parse_repo_meta(repo_meta)
-          category_data = AwesomeElixir.Repo.get_by(AwesomeElixir.Category, [name: category_name])
+          %{pushed_at: days_after_last_commit, stargazers_count: stars} = ExJSON.parse(body, :to_map) 
+            |> AwesomeElixir.Parser.parse_repo_meta
 
-          result ++ [save_awesome_application(%AwesomeElixir.Lib{item | days_after_last_commit: days_after_last_commit, stars: stars, category_id: category_data.id})]
+          result ++ [%{app | days_after_last_commit: days_after_last_commit, stars: stars, category_id: category_id}]
         _ ->
-          Logger.warn("Failed to get metadata for #{item.url}")
+          Logger.warn("Failed to get metadata for #{app.url}")
           result
       end
     end
-
-    get_repo_meta(category_name, tail, result)
   end
 
   defp save_category(category) do
@@ -46,11 +49,15 @@ defmodule AwesomeElixir.Aggregator do
   end
 
   defp save_awesome_application(application) do
-    case AwesomeElixir.Repo.get_by(AwesomeElixir.Lib, [name: application.name]) do
-      nil  -> application
-      saved -> saved
-    end
+    saved = AwesomeElixir.Repo.get_by(AwesomeElixir.Lib, [name: application.name])
+    app = if saved == nil, do: application, else: saved
+
+    app 
     |> AwesomeElixir.Lib.changeset(Map.from_struct(application))
     |> AwesomeElixir.Repo.insert_or_update
+  end
+
+  def delete_old_app(date \\ AwesomeElixir.DateTime.beginning_of_day) do
+    from(a in AwesomeElixir.Lib, where: a.revision_at < ^date) |> AwesomeElixir.Repo.delete_all
   end
 end

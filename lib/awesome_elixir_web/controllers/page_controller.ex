@@ -4,23 +4,21 @@ defmodule AwesomeElixirWeb.PageController do
   use AwesomeElixirWeb, :controller
 
   def index(conn, params) do
+    min_stars = validate_min_stars(params["min_stars"])
+
     c_query = from(
                     c in AwesomeElixir.Category, 
                     join: a in AwesomeElixir.Lib, 
                     on: c.id == a.category_id, 
+                    where: a.stars >= ^min_stars,
                     group_by: c.id,
-                    order_by: c.name
+                    order_by: c.name,
                   )
     a_query = from(
                     a in AwesomeElixir.Lib,
+                    where: a.stars >= ^min_stars,
                     order_by: a.name
                   )
-    min_stars = validate_min_stars(params["min_stars"])
-
-    if min_stars > 0 do
-      c_query = c_query |> where([a], fragment("stars >= ?", ^min_stars))
-      a_query = a_query |> where([a], a.stars >= ^min_stars)
-    end
 
     categories = c_query |> AwesomeElixir.Repo.all
     applications = a_query |> AwesomeElixir.Repo.all
